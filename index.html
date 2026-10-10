@@ -1,0 +1,202 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>5 дыр в сайте от ИИ — чек-лист и промпт проверки</title>
+<meta name="description" content="Ключ в коде, чужие заказы, админка в браузере, SQL-инъекция, пароли открытым текстом. Как проверить сайт и что сказать Клоду. От @artemh_ai.">
+<meta property="og:title" content="5 дыр в сайте от ИИ">
+<meta property="og:description" content="Чек-лист на 5 дыр и промпт, которым Клод проверит весь проект.">
+<meta property="og:type" content="article">
+<meta name="theme-color" content="#141413">
+<style>
+  :root {
+    --bg: #141413;
+    --card: #1f1e1d;
+    --line: #2e2d2b;
+    --text: #f0eee6;
+    --muted: #a3a09a;
+    --accent: #d97757;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html { -webkit-text-size-adjust: 100%; }
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font: 17px/1.5 -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    padding: 28px 18px calc(40px + env(safe-area-inset-bottom));
+  }
+  main { max-width: 560px; margin: 0 auto; }
+  .tag {
+    display: inline-block;
+    font: 600 12px/1 ui-monospace, "SF Mono", Menlo, monospace;
+    letter-spacing: .08em;
+    color: var(--accent);
+    border: 1px solid var(--accent);
+    border-radius: 6px;
+    padding: 6px 8px;
+  }
+  h1 { font-size: 30px; line-height: 1.15; margin: 16px 0 10px; letter-spacing: -.01em; }
+  .lead { color: var(--muted); }
+  ol { list-style: none; margin-top: 22px; }
+  .item {
+    background: var(--card);
+    border: 1px solid var(--line);
+    border-radius: 14px;
+    padding: 16px;
+    margin-top: 12px;
+  }
+  .num { font: 600 13px ui-monospace, "SF Mono", Menlo, monospace; color: var(--accent); }
+  h2 { font-size: 19px; line-height: 1.3; margin: 2px 0 6px; }
+  p + p { margin-top: 8px; }
+  .item p { color: #d6d3cb; font-size: 16px; }
+  code {
+    font: 14px ui-monospace, "SF Mono", Menlo, monospace;
+    background: #2a2927; color: var(--text);
+    border-radius: 5px; padding: 1px 6px; overflow-wrap: anywhere;
+  }
+  .bonus { border-color: var(--accent); }
+  .bonus .num { color: var(--accent); }
+  .cta { margin-top: 28px; text-align: center; }
+  .cta p { color: var(--muted); font-size: 15px; margin-bottom: 14px; }
+  .btn {
+    display: block; width: 100%;
+    font: 600 17px/1 inherit; font-family: inherit;
+    padding: 16px; border-radius: 12px; border: 0;
+    text-decoration: none; cursor: pointer;
+  }
+  .btn-main { background: var(--accent); color: #fff; }
+  .foot { margin-top: 26px; text-align: center; font-size: 13px; color: #6f6c66; }
+  .top { margin-top: 18px; }
+  .btn-ghost { background: transparent; color: var(--text); border: 1px solid var(--line); }
+  .prompt {
+    margin-top: 10px; background: #2a2927; border-radius: 10px; padding: 12px 14px;
+    font: 14px/1.45 ui-monospace, "SF Mono", Menlo, monospace; color: var(--text); white-space: pre-wrap; overflow-wrap: anywhere;
+  }
+  .copy { margin-top: 10px; padding: 12px; font-size: 15px; }
+  .item ul { list-style: none; margin-top: 8px; }
+  .item li + li { margin-top: 8px; }
+  .item li { color: #d6d3cb; font-size: 16px; padding-left: 14px; position: relative; }
+  .item li::before { content: "·"; position: absolute; left: 2px; color: var(--accent); }
+  a { color: var(--accent); }
+  .tg { margin-top: 28px; background: var(--card); border: 1px solid var(--line); border-radius: 14px; padding: 18px 16px 16px; text-align: center; }
+  .tg h2 { margin: 0 0 6px; }
+  .tg p { color: var(--muted); font-size: 15px; margin-bottom: 14px; }
+  .btn-tg { background: #2aabee; color: #fff; }
+  .toast {
+    position: fixed; left: 50%; bottom: calc(24px + env(safe-area-inset-bottom));
+    transform: translateX(-50%) translateY(20px); opacity: 0;
+    background: var(--text); color: var(--bg);
+    padding: 10px 16px; border-radius: 10px; font-size: 15px;
+    transition: .2s; pointer-events: none;
+  }
+  .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+</style>
+</head>
+<body>
+<main>
+  <span class="tag">ШКОЛА ВАЙБКОДИНГА · ЗАЩИТА</span>
+  <h1>5 дыр в сайте от ИИ: как найти и закрыть</h1>
+  <p class="lead">Клод собирает сайт за вечер, но пять дыр встречаются снова и снова. Ниже — как проверить каждую самому, команда <code>/security-review</code> и промпт, которым Клод проверит весь проект. Сверено с документацией Claude Code, октябрь 2026.</p>
+
+  <ol>
+    <li class="item">
+      <span class="num">01</span>
+      <h2>Быстрая проверка перед отправкой</h2>
+      <p>В Claude Code набери <code>/security-review</code>. Клод сравнит твою ветку с веткой на GitHub и разберёт изменения: ключи в коде, инъекции, вход и права, утечки данных. У каждой находки — опасность и совет.</p>
+      <p>Нужен git и проект на GitHub (remote <code>origin</code>). Команда смотрит только <b>новые изменения</b> — то, что уже лежит на GitHub, она не проверит. Для этого — промпт ниже.</p>
+      <p>Нашёл дыры — напиши «исправь» и проверь, что сайт работает.</p>
+    </li>
+    <li class="item">
+      <span class="num">02</span>
+      <h2>Промпт: проверить весь проект</h2>
+      <p>Открой Claude Code в папке проекта и вставь:</p>
+      <div class="prompt" id="p1">Проверь весь проект на безопасность — не только последние изменения. Пройди по пунктам:
+1) ключи, токены и пароли в коде, который уходит в браузер (фронтенд, переменные с префиксами NEXT_PUBLIC_ и VITE_);
+2) можно ли открыть чужие данные, поменяв id в ссылке или запросе — сервер должен проверять, чьи это данные;
+3) проверки входа и прав, которые есть только в браузере;
+4) запросы к базе, склеенные из текста пользователя (SQL-инъекции);
+5) как хранятся пароли пользователей — должен быть только хэш (bcrypt или argon2).
+Если в проекте Supabase — проверь, что на каждой таблице включён RLS и есть политики.
+По каждой находке: файл и строка, чем опасно, насколько срочно. Ничего не меняй, пока я не напишу «исправь».</div>
+      <button class="btn btn-main copy" data-copy="p1">Скопировать промпт</button>
+    </li>
+    <li class="item">
+      <span class="num">ДЫРА 1</span>
+      <h2>Ключ от API в коде страницы</h2>
+      <p><b>Как проверить:</b> открой свой сайт, нажми F12 → вкладка Sources (или «Источники») и поищи по коду <code>sk-</code>, <code>key</code>, <code>token</code>. Что видишь ты — видит любой.</p>
+      <p><b>Как правильно:</b> ключ живёт только на сервере в <code>.env</code>, а <code>.env</code> — в <code>.gitignore</code>. Страница просит твой сервер, сервер ходит в API.</p>
+      <p><b>Ключ уже засветился</b> — перевыпусти его в кабинете сервиса. Старый считай чужим.</p>
+    </li>
+    <li class="item">
+      <span class="num">ДЫРА 2</span>
+      <h2>Чужой заказ по номеру в ссылке</h2>
+      <p><b>Как проверить:</b> заведи два тестовых аккаунта. Под первым открой свой заказ, профиль или файл и поменяй число в ссылке. Открылось чужое — дыра.</p>
+      <p><b>Как правильно:</b> сервер на каждый запрос проверяет, что заказ принадлежит тому, кто вошёл. Скрытая кнопка в интерфейсе не защищает.</p>
+    </li>
+    <li class="item">
+      <span class="num">ДЫРА 3</span>
+      <h2>Пароль админки проверяется в браузере</h2>
+      <p><b>Как проверить:</b> F12 → Sources, поищи <code>admin</code>, <code>password</code>, <code>isAdmin</code>. Пароль или проверка роли в коде страницы — дыра: код страницы можно прочитать и обойти.</p>
+      <p><b>Как правильно:</b> вход и права проверяет сервер, страница только показывает результат.</p>
+    </li>
+    <li class="item">
+      <span class="num">ДЫРА 4</span>
+      <h2>SQL-инъекция через поиск или форму</h2>
+      <p><b>Как проверить:</b> попроси Клода найти места, где запрос к базе собирается из текста пользователя через <code>+</code> или шаблонную строку.</p>
+      <p><b>Как правильно:</b> параметризованные запросы или ORM — текст пользователя никогда не становится частью команды для базы.</p>
+    </li>
+    <li class="item">
+      <span class="num">ДЫРА 5</span>
+      <h2>Пароли пользователей открытым текстом</h2>
+      <p><b>Как проверить:</b> открой таблицу пользователей в базе. Если в колонке пароля читаются <code>qwerty123</code> и <code>12345</code> — беда: при утечке базы их увидят все, а люди ставят те же пароли на почту.</p>
+      <p><b>Как правильно:</b> хранить только хэш (bcrypt или argon2) и сбросить старые пароли.</p>
+    </li>
+    <li class="item bonus">
+      <span class="num">БОНУС</span>
+      <h2>Supabase без RLS</h2>
+      <p>В 2025 исследователь проверил 1 645 приложений из витрины Lovable: у 170 таблицы базы читались без входа — не был включён RLS (CVE-2025-48757).</p>
+      <p><b>Как проверить:</b> в панели Supabase открой Advisors → Security Advisor — он подсветит таблицы без RLS. Включи RLS и добавь политики «пользователь видит только своё».</p>
+    </li>
+    <li class="item">
+      <span class="num">ВАЖНО</span>
+      <h2>Прежде чем проверять</h2>
+      <ul>
+        <li>Проверяй только свои сайты. Чужие — без разрешения владельца нельзя.</li>
+        <li>Клод тоже ошибается: после «исправь» прогони проверку ещё раз и пощёлкай сайт руками.</li>
+        <li>Сайт с деньгами или чужими персональными данными — покажи специалисту по безопасности.</li>
+      </ul>
+    </li>
+  </ol>
+
+  <div class="tg">
+    <h2>Больше разборов — в Telegram</h2>
+    <p>Канал «Out of Tokens — ИИ и Вайбкод»: развёрнутые разборы инструментов и закулисье роликов.</p>
+    <a class="btn btn-tg" href="https://t.me/artemh_ai" target="_blank" rel="noopener">Открыть канал в Telegram</a>
+  </div>
+
+  <div class="cta">
+    <p>Есть знакомый, который вайбкодит сайт?</p>
+    <button class="btn btn-main" id="share">Переслать</button>
+  </div>
+
+  <p class="foot">@artemh_ai · ИИ и вайбкод</p>
+</main>
+
+<div class="toast" id="toast">Скопировано</div>
+
+<script>
+  const toast = s => { const t = document.getElementById('toast'); t.textContent = s; t.classList.add('show'); setTimeout(() => t.classList.remove('show'), 1800); };
+  document.querySelectorAll('[data-copy]').forEach(b => b.addEventListener('click', async () => {
+    await navigator.clipboard.writeText(document.getElementById(b.dataset.copy).textContent);
+    toast('Промпт скопирован');
+  }));
+  document.getElementById('share').addEventListener('click', async () => {
+    const data = { title: document.title, text: '5 дыр в сайте от ИИ: чек-лист и промпт проверки', url: location.href };
+    if (navigator.share) { try { await navigator.share(data); } catch (e) {} return; }
+    await navigator.clipboard.writeText(location.href);
+    toast('Ссылка скопирована');
+  });
+</script>
+</body>
+</html>
